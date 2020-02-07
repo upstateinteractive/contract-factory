@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/upstateinteractive/contract-factory#readme",
   "dependencies": {
+    "@openzeppelin/contracts-ethereum-package": "^2.4.0",
     "@openzeppelin/upgrades": "^2.6.0"
   }
 }

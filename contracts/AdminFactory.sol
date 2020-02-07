@@ -5,8 +5,7 @@ import "./BaseFactory.sol";
 
 /**
  * @title AdminFactory
- * @dev Extends from BaseFactory with a constructor for 
- * initializing the implementation, admin, and init data.
+ * @dev Extends from BaseFactory to keep track of proxy counts and proxy owners
  */
 
 contract AdminFactory is BaseFactory {
@@ -15,6 +14,7 @@ contract AdminFactory is BaseFactory {
     /***************
   EVENTS
   ***************/
+    event ProxyCreated(address _proxy, address _logicContract);
     event ChangedProxyOwner(address _currentOwner, address _newOwner, address _proxy);
 
     /******************
@@ -26,13 +26,6 @@ contract AdminFactory is BaseFactory {
     mapping(address => bool) public isProxy; // informs whether an address is a proxy contract
     address[] public proxyOwners; // array of proxy contract owners
     address[] public proxies; // array of proxy contract addresses
-    /**
-   * It sets logicContract to the address of the initial implementation
-   * @param _implementation address of the initial implementation.
-   */
-    constructor(address _logicContract) public {
-        BaseFactory(_logicContract)
-    }
 
     /**
    * @dev Creates a proxy with the initial implementation and calls it.
@@ -40,8 +33,8 @@ contract AdminFactory is BaseFactory {
    * It should include the signature and the parameters of the function to be called
    * @return Address of the new proxy.
    */
-    function createProxyContract(bytes memory _data) public returns (bool) {
-        address proxyContract = createProxyContract(_data);
+    function createProxyContract(address _logicContract, bytes memory _data) public returns (ProxyContract) {
+        ProxyContract proxyContract = createProxyContract(_logicContract, _data);
 
         ownerProxyCount[msg.sender]++;
         proxyToOwner[address(proxyContract)] = msg.sender;
@@ -51,15 +44,8 @@ contract AdminFactory is BaseFactory {
         proxies.push(address(proxyContract));
         proxyOwners.push(msg.sender);
 
-    }
-
-    /**
-  * @dev updates logicContract with the new implementation address
-  * @param _newImplementation address of new implementation contract
-  */
-    function updateLogicContract(address _newImplementation) public {
-        logicContract = _newImplementation;
-        emit LogicContractUpdated(address(logicContract), _newImplementation);
+        emit ProxyCreated(address(proxyContract), _logicContract);
+        return proxyContract;
     }
 
     /**
@@ -96,7 +82,7 @@ contract AdminFactory is BaseFactory {
     }
 
     /**
-  * @dev checks if contract address is a proxy contract 
+  * @dev checks if contract address is a proxy contract
   * @param _address address of proxy contract
   */
     function isProxy(address _address) public view returns (bool) {

@@ -30,8 +30,8 @@ contract ProxyContract is Proxy {
         assert(IMPLEMENTATION_SLOT == bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1));
         _setImplementation(_logic);
         if(_data.length > 0) {
-        (bool success,) = _logic.delegatecall(_data);
-        require(success);
+            (bool success,) = _logic.delegatecall(_data);
+            require(success);
         }
     }
 
@@ -42,7 +42,7 @@ contract ProxyContract is Proxy {
     function _implementation() internal view returns (address impl) {
         bytes32 slot = IMPLEMENTATION_SLOT;
         assembly {
-        impl := sload(slot)
+            impl := sload(slot)
         }
     }
 
@@ -56,7 +56,7 @@ contract ProxyContract is Proxy {
         bytes32 slot = IMPLEMENTATION_SLOT;
 
         assembly {
-        sstore(slot, newImplementation)
+            sstore(slot, newImplementation)
         }
     }
 }
