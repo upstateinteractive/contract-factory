@@ -1,17 +1,19 @@
 pragma solidity ^0.5.0;
 
-import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./ProxyContract.sol";
 
-contract ContractFactory {
-    using SafeMath for uint256;
+/**
+ * @title BaseFactory
+ * @dev This contract creates proxy contracts
+ */
+
+contract BaseFactory {
 
     /***************
   EVENTS
   ***************/
     event ProxyCreated(address proxyContract, address logicContract);
-    event MasterCopyUpdated(address masterCopy, address _newImplementation);
-    event ChangedProxyOwner(address _currentOwner, address _newOwner, address _proxy);
+    event LogicContractUpdated(address masterCopy, address _newImplementation);
 
     /******************
   INTERNAL ACCOUNTING
@@ -19,11 +21,11 @@ contract ContractFactory {
     address public logicContract; // address of the logic contract that all proxies will point to
 
     /**
-   * It sets logicContract to the address of the initial implementation
+   * @dev It sets logicContract to the address of the initial implementation
    * @param _implementation address of the initial implementation.
    */
-    constructor(address _implementation) public {
-        logicContract = _implementation;
+    constructor(address _logicContract) public {
+        logicContract = _logicContract;
     }
 
     /**
@@ -32,7 +34,7 @@ contract ContractFactory {
    * It should include the signature and the parameters of the function to be called
    * @return Address of the new proxy.
    */
-    function createClone(bytes memory _data) public returns (ProxyContract) {
+    function createProxyContract(bytes memory _data) public returns (ProxyContract) {
         ProxyContract proxyContract = new ProxyContract(logicContract, _data);
 
         emit ProxyCreated(address(proxyContract), logicContract);
@@ -43,8 +45,9 @@ contract ContractFactory {
   * @dev updates logicContract with the new implementation address
   * @param _newImplementation address of new implementation contract
   */
-    function updatedLogicContract(address _newImplementation) public {
-        logicContract = _newImplementation;
+    function updateLogicContract(address _newLogicContract) public {
+        logicContract = _newLogicContract;
+        emit MasterCopyUpdated(address(logicContract), _newLogicContract);
     }
 
 }

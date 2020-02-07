@@ -25,7 +25,7 @@ contract ProxyContract is Proxy {
     * https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#function-selector-and-argument-encoding.
     * This parameter is optional, if no data is given the initialization call to proxied contract will be skipped.
     */
-    function initialize(address _logic, bytes memory _data) public payable {
+    constructor(address _logic, bytes memory _data) public payable {
         require(_implementation() == address(0));
         assert(IMPLEMENTATION_SLOT == bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1));
         _setImplementation(_logic);
